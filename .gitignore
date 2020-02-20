@@ -41,6 +41,9 @@ build/Release
 node_modules/
 jspm_packages/
 
+# Transpiled directory
+dist-server
+
 # TypeScript v1 declaration files
 typings/
 
