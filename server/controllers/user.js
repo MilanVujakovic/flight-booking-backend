@@ -38,3 +38,21 @@ export const login = async (req, res) => {
         res.status(400).send(error);
     }
 }
+
+export const me = async (req, res) => {
+    // Middleware will check if there is logged user, and will add his info to req.user
+    res.send(req.user);
+}
+
+export const logout = async (req, res) => {
+    // Middleware will check if there is logged user, and will add his info to req.user
+    try {
+       req.user.tokens = req.user.tokens.filter((token) => {
+           return token != req.token;
+       }); 
+       await req.user.save();
+       res.send();
+    } catch (error) {
+        res.status(500).send(error);
+    }
+}
