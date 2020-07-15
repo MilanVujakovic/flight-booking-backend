@@ -1,11 +1,10 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import validator from 'validator';
 import jwt from 'jsonwebtoken';
 
-import "regenerator-runtime/runtime"; // Needed for ES6 to work (async)
-
 const SALT_ROUNDS = 10;
+const Schema = mongoose.Schema;
 
 export const UserSchema = new Schema(
     {
@@ -40,10 +39,11 @@ export const UserSchema = new Schema(
             }
         }],
 
-        displayName: {
+        username: {
             type: String,
             trim: true,
             index: true,
+            unique: true,
             required: true
         },
 
@@ -54,8 +54,21 @@ export const UserSchema = new Schema(
         },
 
         dateOfBirth: {
-            type: Date,
-            required: true
+            day: {
+                type: Number,
+                trim: true,
+                required: true
+            },
+            month: {
+                type: String,
+                trim: true,
+                required: true
+            },
+            year: {
+                type: Number,
+                trim: true,
+                required: true
+            }
         },
 
         url: {
@@ -66,13 +79,19 @@ export const UserSchema = new Schema(
         },
 
         contact: {
-            adress: {
+            streetAddress: {
                 type: String,
                 trim: true,
                 required: true
             },
 
             city: {
+                type: String,
+                trim: true,
+                required: true
+            },
+
+            postalCode: {
                 type: String,
                 trim: true,
                 required: true
@@ -91,7 +110,7 @@ export const UserSchema = new Schema(
             }
         }
     },
-    { collection: 'users', timestamps: true}
+    { collection: 'users', timestamps: true }
 );
 
 UserSchema.pre('save', async function(next) {
@@ -105,7 +124,7 @@ UserSchema.pre('save', async function(next) {
 UserSchema.methods.generateAuthToken = async function() {
     const user = this;
     const token = jwt.sign({id: user._id}, process.env.JWT_KEY, {expiresIn: '2 days'});
-    user.tokens.push({token});
+    user.tokens.push({ token });
     await user.save();
     return token;
 }
@@ -118,14 +137,16 @@ UserSchema.methods.toJSON = function() {
   
 
 UserSchema.statics.findByCredentials = async (email, password) => {
-    const user = await User.findOne({email});
+    const user = await User.findOne({ email });
+    
     if(!user) {
-        throw new Error({ error: 'Invalid login credentials' });
+        throw new Error('Incorrect email or password.');
     }
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if(!isPasswordMatch) {
-        throw new Error({ error: 'Invalid login credentials' });
+        throw new Error('Incorrect email or password.');
     }
+    
     return user;
 }
 
