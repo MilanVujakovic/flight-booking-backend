@@ -42,19 +42,99 @@ export const FlightSchema = new Schema({
         departure: Date
     }],
 
-    class: {
-        type: String,
-        trim: true,
+    availableSeats: {
+        economy: Number,
+        premiumEconomy: Number,
+        business: Number,
+        first: Number,
+        required: true
+    },
+    
+    seats: {
+        economy: Number,
+        premiumEconomy: Number,
+        business: Number,
+        first: Number,
         required: true
     },
 
     Travellers: {
-        adults: {
+
+        registeredAdults: {
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        },
+
+        adults: [{
+            fullName: {
+                type: String,
+                required: true
+            },
+            dateOfBirth: {
+                day: {
+                    type: Number,
+                    trim: true,
+                    required: true
+                },
+                month: {
+                    type: String,
+                    trim: true,
+                    required: true
+                },
+                year: {
+                    type: Number,
+                    trim: true,
+                    required: true
+                }
+            },
+            country: {
+                type: String,
+                required: true
+            },
+            passportNumber: {
+                type: String,
+                required: true
+            }
+        }],
+
+        children: [{
+            fullName: {
+                type: String,
+                required: true
+            },
+            dateOfBirth: {
+                day: {
+                    type: Number,
+                    trim: true,
+                    required: true
+                },
+                month: {
+                    type: String,
+                    trim: true,
+                    required: true
+                },
+                year: {
+                    type: Number,
+                    trim: true,
+                    required: true
+                }
+            },
+            country: {
+                type: String,
+                required: true
+            },
+            passportNumber: {
+                type: String,
+                required: true
+            }
+        }],
+
+        numberOfAdults: {
             type: Number,
             required: true,
         },
 
-        children: Number
+        numberOfChildren: Number
     },
 
     price: {
@@ -62,6 +142,8 @@ export const FlightSchema = new Schema({
         required: true
     }
 }, { collection: 'Flights', timestamps: true });
+
+
 
 const Flight = mongoose.model('Flight', FlightSchema);
 
